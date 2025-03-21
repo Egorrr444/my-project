@@ -108,3 +108,33 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 def get_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
+
+
+@app.get("/users/{user_id}", response_model=UserResponse)
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    return db_user
+    
+
+@app.post("/users/{user_id}", response_model=UserResponse)
+def update_users(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    for key, value in user.dict().items():
+        setattr(db_user, key, value)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    
+
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    db.delete(db_user)
+    db.commit()
+    return {"message": "Пользователь удален"}
