@@ -13,7 +13,7 @@ T = TypeVar("T")
 class PaginatedResponce(BaseModel, Generic[T]):
     items: List[T]
     total: int # Кол-во элементов
-    page: int # Тек. стр.
+    page: int # Текуш. стр.
     size: int # Кол-во элементов на стр.
     pages: int # Всего стр.
 
@@ -99,7 +99,7 @@ def get_movies(
     if is_available is not None:
         query = query.filter(Movie.is_available == is_available)
     
-    return query.offset(skip).limit(limit).all()
+    return query.offset(skip).limit(limit).all()#сколько записей пропустить/сколько записей показать
 
 
 def get_movie(db: Session, movie_id: int):
